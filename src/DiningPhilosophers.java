@@ -72,7 +72,7 @@ public class DiningPhilosophers {
             }
         }
         catch(IOException ex) {System.out.print("IOException: " + ex.getMessage());}
-        catch(NumberFormatException ex) {System.out.print("Your input data is not a number");}
+        catch(NumberFormatException ex) {System.out.print("Your input data.txt is not a number");}
     }
     class Philosopher extends Thread {
         private final int number = philosophersCount;
