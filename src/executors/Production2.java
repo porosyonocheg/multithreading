@@ -4,6 +4,9 @@ import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/** @see Production The same task (without manager checking) is realized with concurrent.ExecutorService
+ * @author Sergey Shershavin*/
+
 public class Production2 {
     private int[] array;
 

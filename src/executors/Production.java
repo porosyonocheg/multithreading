@@ -2,6 +2,10 @@ package executors;
 
 import java.util.LinkedList;
 
+/** The task is to do some work by any number of workers a given number of times and then the manager checks it.
+ * We create a queue of the tasks and send it to the manager.
+ * @author Sergey Shershavin*/
+
 public class Production {
     private int[] array;
 
@@ -34,9 +38,9 @@ public class Production {
     }
 
     private void generateArray() {
-        array = new int[9999];
+        array = new int[10000];
         for (int i = 0; i < array.length; i++) {
-            array[i] = (int) (Math.random() * 99999);
+            array[i] = (int) (Math.random() * 100000);
         }
     }
 }

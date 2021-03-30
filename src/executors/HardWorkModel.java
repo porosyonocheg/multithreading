@@ -1,5 +1,8 @@
 package executors;
 
+/** Bubble sort of integer arrays
+ * @author Sergey Shershavin*/
+
 public class HardWorkModel {
     public void sort (int[] array) {
         boolean isSorted = false;

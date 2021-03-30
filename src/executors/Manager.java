@@ -4,11 +4,21 @@ import java.util.LinkedList;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
+/** Manager rewrite the queue of tasks in a BlockingQueue to synchronize access to tasks among all workers
+ * and then create and start all the workers in his constructor. Then he waits the finish flag to check the work.
+ * Each worker takes a task from the queue and do it in its own thread. If the queue is empty, one should notify
+ * the manager.
+ * @author Sergey Shershavin*/
+
 public class Manager implements Runnable {
     private int numberOfWorkers;
     private final BlockingQueue<Runnable> queue;
     private boolean finish;
 
+    /**Constructor contains:
+     * @param queue the queue of tasks
+     * @param number the number of workers
+     * */
     public Manager(LinkedList<Runnable> queue, int number) {
         int size = queue.size();
         this.queue = new ArrayBlockingQueue<>(size);
@@ -23,7 +33,7 @@ public class Manager implements Runnable {
             workers[i].start();
         }
     }
-
+/**If we don't have any tasks, the workers stop working and the manager checks the work*/
     public void stop() {
         finish = true;
     }
