@@ -1,3 +1,10 @@
+/** A cigarette agent, a paper supplier, a tobacco supplier, and a match supplier are seated at the table.
+ * The agent places two random items on the table for making a cigarette, and the one who has the missing component
+ * takes them, makes and smokes a cigarette. The process continues for the specified number of rounds.
+ * Synchronization is done using the object of CigaretteSmokers.class as a monitor and boolean flags, those show which
+ * items are on the table at the moment
+ * @author Sergey Shershavin*/
+
 public class CigaretteSmokers {
     protected final int rounds;
 
@@ -11,7 +18,7 @@ public class CigaretteSmokers {
     }
 
     public static void main(String[] args) {
-        CigaretteSmokers cigaretteSmokers = new CigaretteSmokers(10);
+        CigaretteSmokers cigaretteSmokers = new CigaretteSmokers(3);
         new Agent(cigaretteSmokers).start();
     }
 }
@@ -29,9 +36,9 @@ class Agent extends Thread {
         isTobaccoOnTheTable = false;
         isPaperOnTheTable = false;
         isMatchOnTheTable = false;
-        new TobaccoDealer().start();
-        new PaperDealer().start();
-        new MatchDealer().start();
+        new Thread(new TobaccoDealer(),"Tobacco dealer").start();
+        new Thread(new PaperDealer(),"Paper dealer").start();
+        new Thread(new MatchDealer(),"Match dealer").start();
     }
 
 
@@ -46,25 +53,29 @@ class Agent extends Thread {
             }
             synchronized(cigaretteSmokers) {
                 cigaretteSmokers.notifyAll();
-                while ((isTobaccoOnTheTable && isPaperOnTheTable) || (isTobaccoOnTheTable && isMatchOnTheTable) || (isMatchOnTheTable && isPaperOnTheTable) && count > 0) try {
+                try {
+                while ((isTobaccoOnTheTable && isPaperOnTheTable) || (isTobaccoOnTheTable && isMatchOnTheTable) || (isMatchOnTheTable && isPaperOnTheTable) && count > 0) {
                     count--;
                     cigaretteSmokers.wait();
+                }
                 } catch (InterruptedException ignored) {}
             }
         }
     }
 
-    class MatchDealer extends Thread {
+    class MatchDealer implements Runnable {
         public void run() {
         while (count > 0) {
             synchronized (cigaretteSmokers) {
                 try {
-                    while (!isTobaccoOnTheTable || !isPaperOnTheTable && count > 0) {
+                    while ((!isTobaccoOnTheTable || !isPaperOnTheTable) && count > 0) {
                         cigaretteSmokers.wait();
                     }
+                    if (isTobaccoOnTheTable && isPaperOnTheTable) {
                     isTobaccoOnTheTable = false;
                     isPaperOnTheTable = false;
                     cigaretteSmokers.smoke();
+                    }
                 } catch (InterruptedException ignored) {}
                 cigaretteSmokers.notifyAll();
             }
@@ -72,17 +83,19 @@ class Agent extends Thread {
         }
     }
 
-    class TobaccoDealer extends Thread {
+    class TobaccoDealer implements Runnable {
         public void run() {
             while (count > 0) {
                 synchronized (cigaretteSmokers) {
                     try {
-                        while (!isMatchOnTheTable || !isPaperOnTheTable && count > 0) {
+                        while ((!isMatchOnTheTable || !isPaperOnTheTable) && count > 0) {
                             cigaretteSmokers.wait();
                         }
+                        if (isPaperOnTheTable && isMatchOnTheTable) {
                         isMatchOnTheTable = false;
                         isPaperOnTheTable = false;
                         cigaretteSmokers.smoke();
+                        }
                     } catch (InterruptedException ignored) {
                     }
                     cigaretteSmokers.notifyAll();
@@ -91,17 +104,19 @@ class Agent extends Thread {
         }
     }
 
-    class PaperDealer extends Thread {
+    class PaperDealer implements Runnable {
         public void run() {
             while (count > 0) {
                 synchronized (cigaretteSmokers) {
                     try {
-                        while (!isTobaccoOnTheTable || !isMatchOnTheTable && count > 0) {
+                        while ((!isTobaccoOnTheTable || !isMatchOnTheTable) && count > 0) {
                             cigaretteSmokers.wait();
                         }
+                        if (isTobaccoOnTheTable && isMatchOnTheTable) {
                         isTobaccoOnTheTable = false;
                         isMatchOnTheTable = false;
                         cigaretteSmokers.smoke();
+                        }
                     } catch (InterruptedException ignored) {
                     }
                     cigaretteSmokers.notifyAll();
